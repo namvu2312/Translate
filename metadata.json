@@ -1,0 +1,5 @@
+{
+  "name": "Copy of AI Text Extractor & Translator",
+  "description": "Upload an image or PDF to extract text. Select portions of the text to translate into Vietnamese, get phonetic transcriptions, and export the results to an Excel file.",
+  "requestFramePermissions": []
+}
