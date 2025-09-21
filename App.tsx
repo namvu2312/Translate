@@ -274,7 +274,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 lg:p-8">
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 lg:p-8 flex flex-col">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
           AI Text Extractor & Translator
@@ -292,7 +292,7 @@ function App() {
         </div>
       )}
       
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6" style={{height: 'calc(100vh - 12rem)'}}>
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
         <FileUpload onFileChange={handleFileChange} onReset={handleReset} file={file} isLoading={isLoading} />
         {isLoading ? (
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center">
@@ -310,6 +310,11 @@ function App() {
             results={translationResults}
         />
       </main>
+      
+      <footer className="text-center pt-8 flex-shrink-0 text-gray-500 text-sm">
+        <p>&copy; 2025 AI Text Extractor & Translator. All Rights Reserved.</p>
+        <p className="mt-1">Một dự án cá nhân của Nam Vũ</p>
+      </footer>
     </div>
   );
 }
