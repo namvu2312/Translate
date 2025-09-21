@@ -142,20 +142,24 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                 <thead className="text-xs text-sky-300 uppercase bg-gray-700 sticky top-0">
                     <tr>
                         <th scope="col" className="px-4 py-3">English</th>
+                        <th scope="col" className="px-4 py-3">Word Type</th>
                         <th scope="col" className="px-4 py-3">Phonetic</th>
                         <th scope="col" className="px-4 py-3">Vietnamese</th>
+                        <th scope="col" className="px-4 py-3">Example</th>
                     </tr>
                 </thead>
                 <tbody>
                     {results.length > 0 ? results.map((res, index) => (
                          <tr key={index} className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600">
                             <td className="px-4 py-3 font-medium text-white">{res.english}</td>
+                            <td className="px-4 py-3">{res.wordType}</td>
                             <td className="px-4 py-3">{res.phonetic}</td>
                             <td className="px-4 py-3">{res.vietnamese}</td>
+                            <td className="px-4 py-3">{res.example}</td>
                         </tr>
                     )) : (
                         <tr>
-                            <td colSpan={3} className="text-center py-8 text-gray-500">Translation results will show here.</td>
+                            <td colSpan={5} className="text-center py-8 text-gray-500">Translation results will show here.</td>
                         </tr>
                     )}
                 </tbody>

@@ -15,17 +15,21 @@ export const exportToExcel = (data: TranslationResult[], fileName: string): void
 
   const dataToExport = data.map(item => ({
     "Tiếng Anh": item.english,
+    "Từ loại": item.wordType,
     "Phiên âm": item.phonetic,
-    "Tiếng Việt": item.vietnamese
+    "Tiếng Việt": item.vietnamese,
+    "Ví dụ": item.example
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(dataToExport);
 
   // Set column widths for better readability
   worksheet['!cols'] = [
-    { wch: 40 }, // English
-    { wch: 40 }, // Phonetic
-    { wch: 40 }, // Vietnamese
+    { wch: 30 }, // English
+    { wch: 20 }, // Word Type
+    { wch: 30 }, // Phonetic
+    { wch: 30 }, // Vietnamese
+    { wch: 50 }, // Example
   ];
 
   const workbook = XLSX.utils.book_new();
