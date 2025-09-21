@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import type { TranslationResult, SelectedText } from './types';
 import { extractTextFromFile, translateAndPhoneticize } from './services/geminiService';
@@ -74,26 +73,40 @@ interface TextViewerProps {
 }
 
 const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect }) => {
-  const handleMouseUp = () => {
-    const selection = window.getSelection()?.toString().trim();
-    if (selection) {
-      onTextSelect(selection);
+  const handleLineClick = (line: string) => {
+    const trimmedLine = line.trim();
+    if (trimmedLine) {
+      onTextSelect(trimmedLine);
     }
   };
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col">
       <h2 className="text-xl font-bold mb-4 text-sky-300">2. Extracted Text</h2>
-      <div className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto" onMouseUp={handleMouseUp}>
+      <div className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto">
         {text ? (
-            <pre className="text-gray-300 whitespace-pre-wrap text-sm">{text}</pre>
+          <div className="text-gray-300 whitespace-pre-wrap text-sm" aria-label="Extracted text content. Click a line to select it.">
+            {text.split('\n').map((line, index) => (
+              <p
+                key={index}
+                onClick={() => handleLineClick(line)}
+                className="cursor-pointer hover:bg-sky-900/50 rounded-md -mx-2 px-2 py-1 transition-colors"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleLineClick(line); }}
+                aria-label={`Select line: ${line.trim()}`}
+              >
+                {line || '\u00A0'}
+              </p>
+            ))}
+          </div>
         ) : (
-            <div className="flex items-center justify-center h-full text-gray-500">
-                Text from your file will appear here.
-            </div>
+          <div className="flex items-center justify-center h-full text-gray-500">
+            Text from your file will appear here.
+          </div>
         )}
       </div>
-       <p className="text-xs text-gray-500 mt-2 text-center">Highlight text above to add it to the selection panel.</p>
+      <p className="text-xs text-gray-500 mt-2 text-center">Tap on a line of text above to add it to the selection panel.</p>
     </div>
   );
 };
@@ -125,7 +138,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                     ))}
                  </ul>
             ) : (
-                <div className="flex items-center justify-center h-full text-gray-500 text-sm">Text you highlight will be listed here.</div>
+                <div className="flex items-center justify-center h-full text-gray-500 text-sm">Text you select will be listed here.</div>
             )}
         </div>
 
