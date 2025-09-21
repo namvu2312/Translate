@@ -73,32 +73,27 @@ interface TextViewerProps {
 }
 
 const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect }) => {
-  const handleLineClick = (line: string) => {
-    const trimmedLine = line.trim();
-    if (trimmedLine) {
-      onTextSelect(trimmedLine);
+  const handleSelection = () => {
+    const selection = window.getSelection();
+    if (selection) {
+      const selectedText = selection.toString().trim();
+      if (selectedText) {
+        onTextSelect(selectedText);
+      }
     }
   };
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col">
       <h2 className="text-xl font-bold mb-4 text-sky-300">2. Extracted Text</h2>
-      <div className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto">
+      <div
+        className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto"
+        onMouseUp={handleSelection}
+        onTouchEnd={handleSelection} // For mobile devices
+      >
         {text ? (
-          <div className="text-gray-300 whitespace-pre-wrap text-sm" aria-label="Extracted text content. Click a line to select it.">
-            {text.split('\n').map((line, index) => (
-              <p
-                key={index}
-                onClick={() => handleLineClick(line)}
-                className="cursor-pointer hover:bg-sky-900/50 rounded-md -mx-2 px-2 py-1 transition-colors"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleLineClick(line); }}
-                aria-label={`Select line: ${line.trim()}`}
-              >
-                {line || '\u00A0'}
-              </p>
-            ))}
+          <div className="text-gray-300 whitespace-pre-wrap text-sm select-text" aria-live="polite">
+            {text}
           </div>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
@@ -106,7 +101,7 @@ const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect }) => {
           </div>
         )}
       </div>
-      <p className="text-xs text-gray-500 mt-2 text-center">Tap on a line of text above to add it to the selection panel.</p>
+      <p className="text-xs text-gray-500 mt-2 text-center">Highlight a word or phrase above to add it to the selection panel.</p>
     </div>
   );
 };
