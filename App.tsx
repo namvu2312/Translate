@@ -140,9 +140,17 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
         <button 
             onClick={onTranslate} 
             disabled={selectedTexts.length === 0 || isTranslating}
-            className="w-full flex items-center justify-center px-4 py-3 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors mb-4"
+            className="w-full flex items-center justify-center px-4 py-3 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors mb-2"
         >
             {isTranslating ? <Spinner text="Translating..." /> : <><TranslateIcon /> Translate Selection</>}
+        </button>
+
+        <button
+            onClick={onExport}
+            disabled={results.length === 0}
+            className="mb-4 w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+        >
+            <DownloadIcon /> Export to Excel
         </button>
         
         <div className="flex-grow overflow-auto border border-gray-700 rounded-md">
@@ -173,13 +181,6 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                 </tbody>
             </table>
         </div>
-        <button
-            onClick={onExport}
-            disabled={results.length === 0}
-            className="mt-4 w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-        >
-            <DownloadIcon /> Export to Excel
-        </button>
   </div>
 );
 
