@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import type { TranslationResult, SelectedText } from './types';
 import { extractTextFromFile, translateAndPhoneticize } from './services/geminiService';
@@ -33,7 +32,7 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, onReset, file, isLoading, className }) => (
-  <div className={`bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col justify-between ${className || ''}`}>
+  <div className={`bg-gray-800 p-4 rounded-lg shadow-lg h-full flex flex-col justify-between border border-gray-700 ${className || ''}`}>
     <div>
         <h2 className="text-xl font-bold mb-4 text-sky-300">1. Upload File</h2>
         <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-4">
@@ -86,7 +85,7 @@ const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }
   };
 
   return (
-    <div className={`bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col ${className || ''}`}>
+    <div className={`bg-gray-800 p-4 rounded-lg shadow-lg h-full flex flex-col border border-gray-700 ${className || ''}`}>
       <h2 className="text-xl font-bold mb-4 text-sky-300">2. Extracted Text</h2>
       <div className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto" onMouseUp={handleMouseUp}>
         {text ? (
@@ -113,7 +112,7 @@ interface ResultsPanelProps {
 }
 
 const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText, onTranslate, onExport, isTranslating, results, className }) => (
-    <div className={`bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col ${className || ''}`}>
+    <div className={`bg-gray-800 p-4 rounded-lg shadow-lg h-full flex flex-col border border-gray-700 ${className || ''}`}>
         <h2 className="text-xl font-bold mb-4 text-sky-300">3. Select & Translate</h2>
         
         <div className="border border-gray-700 rounded-md p-3 mb-4 flex-shrink-0 h-40 overflow-y-auto">
@@ -289,7 +288,7 @@ function App() {
       <main className="grid grid-cols-1 lg:grid-cols-6 gap-6 lg:h-[calc(100vh-12rem)]">
         <FileUpload onFileChange={handleFileChange} onReset={handleReset} file={file} isLoading={isLoading} className="lg:col-span-1" />
         {isLoading ? (
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center h-full lg:col-span-3">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center h-full lg:col-span-3 border border-gray-700">
                  <Spinner text="Extracting text..." />
             </div>
         ) : (
