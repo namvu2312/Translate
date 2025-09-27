@@ -187,15 +187,36 @@ interface FeedbackModalProps {
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose }) => {
   const [feedbackText, setFeedbackText] = useState('');
+  const [submissionState, setSubmissionState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (feedbackText.trim() === '') {
-      return; // Don't send empty feedback
+      return;
     }
-    const subject = encodeURIComponent("Feedback for AI Text Extractor & Translator");
-    const body = encodeURIComponent(feedbackText);
-    window.location.href = `mailto:borutosolo23@gmail.com?subject=${subject}&body=${body}`;
-    onClose();
+    setSubmissionState('submitting');
+
+    try {
+      const response = await fetch('https://formspree.io/f/xnngjbnq', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ feedback: feedbackText }),
+      });
+
+      if (response.ok) {
+        setSubmissionState('success');
+        setTimeout(() => {
+          onClose();
+        }, 2500); // Close after 2.5 seconds
+      } else {
+        setSubmissionState('error');
+      }
+    } catch (error) {
+      console.error('Feedback submission error:', error);
+      setSubmissionState('error');
+    }
   };
 
   return (
@@ -203,34 +224,52 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose }) => {
       <div className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 border border-gray-700">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-sky-300">Góp Ý & Báo Lỗi</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-gray-400 hover:text-white" disabled={submissionState === 'submitting' || submissionState === 'success'}>
              <XCircleIcon />
           </button>
         </div>
-        <p className="text-gray-400 mb-4 text-sm">Cảm ơn bạn đã dành thời gian. Mọi góp ý sẽ giúp ứng dụng tốt hơn.</p>
-        <textarea
-          value={feedbackText}
-          onChange={(e) => setFeedbackText(e.target.value)}
-          placeholder="Nhập nội dung góp ý của bạn ở đây..."
-          className="w-full h-40 bg-gray-900 text-gray-300 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
-          aria-label="Feedback input"
-        />
-        <div className="flex justify-end mt-6 space-x-3">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 transition">
-            Hủy
-          </button>
-          <button 
-            onClick={handleSubmit} 
-            disabled={!feedbackText.trim()}
-            className="px-4 py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition"
-          >
-            Gửi
-          </button>
-        </div>
+        
+        {submissionState === 'success' ? (
+            <div className="bg-green-900 border border-green-500 text-green-200 text-center px-4 py-3 rounded-lg relative">
+                Cảm ơn bạn đã góp ý! Cửa sổ sẽ tự động đóng.
+            </div>
+        ) : (
+            <>
+                <p className="text-gray-400 mb-4 text-sm">Cảm ơn bạn đã dành thời gian. Mọi góp ý sẽ giúp ứng dụng tốt hơn.</p>
+                {submissionState === 'error' && (
+                     <div className="bg-red-900 border border-red-500 text-red-200 text-center px-4 py-3 rounded-lg relative mb-4">
+                        Gửi thất bại. Vui lòng kiểm tra kết nối và thử lại.
+                    </div>
+                )}
+                <textarea
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Nhập nội dung góp ý của bạn ở đây..."
+                  className="w-full h-40 bg-gray-900 text-gray-300 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                  aria-label="Feedback input"
+                  disabled={submissionState === 'submitting'}
+                />
+                <div className="flex justify-end mt-6 space-x-3">
+                  {/* FIX: Removed `|| submissionState === 'success'` from the disabled check. This comparison caused a TypeScript error because the 'submissionState' type is narrowed within this conditional render block and can never be 'success'. The button only needs to be disabled while submitting. */}
+                  <button onClick={onClose} className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 transition" disabled={submissionState === 'submitting'}>
+                    Hủy
+                  </button>
+                  {/* FIX: Removed `|| submissionState === 'success'` from the disabled check for the same reason as the button above. */}
+                  <button 
+                    onClick={handleSubmit} 
+                    disabled={!feedbackText.trim() || submissionState === 'submitting'}
+                    className="px-4 py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition w-24 flex items-center justify-center"
+                  >
+                    {submissionState === 'submitting' ? <Spinner /> : 'Gửi'}
+                  </button>
+                </div>
+            </>
+        )}
       </div>
     </div>
   );
 };
+
 
 // --- Main App Component ---
 
