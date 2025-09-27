@@ -54,12 +54,12 @@ export const translateAndPhoneticize = async (texts: string[]): Promise<Translat
     return [];
   }
 
-  const prompt = `For the following list of English words or phrases, provide the Vietnamese translation, the IPA phonetic transcription, the word type (e.g., noun, verb, adjective), and a simple example sentence in English.
+  const prompt = `For the following list of English phrases, provide the Vietnamese translation and the IPA phonetic transcription for each phrase.
   
   Phrases:
   ${texts.map(text => `- "${text}"`).join('\n')}
   
-  Return the result as a valid JSON array of objects. Each object must have five keys: 'english', 'phonetic', 'vietnamese', 'wordType', and 'example'. The 'english' key must exactly match the input phrase.`;
+  Return the result as a valid JSON array of objects. Each object must have three keys: 'english', 'phonetic', and 'vietnamese'. The 'english' key must exactly match the input phrase.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -84,16 +84,8 @@ export const translateAndPhoneticize = async (texts: string[]): Promise<Translat
                 type: Type.STRING,
                 description: 'The Vietnamese translation of the phrase.',
               },
-              wordType: {
-                type: Type.STRING,
-                description: 'The part of speech of the English phrase (e.g., Noun, Verb, Adjective).',
-              },
-              example: {
-                type: Type.STRING,
-                description: 'A simple example sentence using the English phrase.',
-              },
             },
-            required: ["english", "phonetic", "vietnamese", "wordType", "example"],
+            required: ["english", "phonetic", "vietnamese"],
           },
         },
       },

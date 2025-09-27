@@ -3,8 +3,6 @@ export interface TranslationResult {
   english: string;
   phonetic: string;
   vietnamese: string;
-  wordType: string;
-  example: string;
 }
 
 export interface SelectedText {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { TranslationResult, SelectedText } from './types';
 import { extractTextFromFile, translateAndPhoneticize } from './services/geminiService';
@@ -28,34 +29,37 @@ interface FileUploadProps {
   onReset: () => void;
   file: File | null;
   isLoading: boolean;
+  className?: string;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, onReset, file, isLoading }) => (
-  <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col">
-    <h2 className="text-xl font-bold mb-4 text-sky-300">1. Upload File</h2>
-    <div className="flex-grow flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-4">
-      <input
-        type="file"
-        id="file-upload"
-        className="hidden"
-        accept="image/*,application/pdf"
-        onChange={(e) => e.target.files && onFileChange(e.target.files[0])}
-        disabled={isLoading || !!file}
-      />
-      {!file ? (
-        <>
-            <UploadIcon />
-            <label htmlFor="file-upload" className="cursor-pointer text-sky-400 hover:text-sky-300 font-semibold">
-            Choose an image or PDF
-            </label>
-            <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF, PDF</p>
-        </>
-      ) : (
-        <div className="text-center">
-            <p className="font-semibold text-green-400">File Selected:</p>
-            <p className="text-sm text-gray-300 break-all">{file.name}</p>
+const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, onReset, file, isLoading, className }) => (
+  <div className={`bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col justify-between ${className || ''}`}>
+    <div>
+        <h2 className="text-xl font-bold mb-4 text-sky-300">1. Upload File</h2>
+        <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-4">
+        <input
+            type="file"
+            id="file-upload"
+            className="hidden"
+            accept="image/*,application/pdf"
+            onChange={(e) => e.target.files && onFileChange(e.target.files[0])}
+            disabled={isLoading || !!file}
+        />
+        {!file ? (
+            <>
+                <UploadIcon />
+                <label htmlFor="file-upload" className="cursor-pointer text-sky-400 hover:text-sky-300 font-semibold">
+                Choose an image or PDF
+                </label>
+                <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF, PDF</p>
+            </>
+        ) : (
+            <div className="text-center">
+                <p className="font-semibold text-green-400">File Selected:</p>
+                <p className="text-sm text-gray-300 break-all">{file.name}</p>
+            </div>
+        )}
         </div>
-      )}
     </div>
     <button
         onClick={onReset}
@@ -70,38 +74,30 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, onReset, file, is
 interface TextViewerProps {
   text: string;
   onTextSelect: (selected: string) => void;
+  className?: string;
 }
 
-const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect }) => {
-  const handleSelection = () => {
-    const selection = window.getSelection();
+const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }) => {
+  const handleMouseUp = () => {
+    const selection = window.getSelection()?.toString().trim();
     if (selection) {
-      const selectedText = selection.toString().trim();
-      if (selectedText) {
-        onTextSelect(selectedText);
-      }
+      onTextSelect(selection);
     }
   };
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col">
+    <div className={`bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col ${className || ''}`}>
       <h2 className="text-xl font-bold mb-4 text-sky-300">2. Extracted Text</h2>
-      <div
-        className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto"
-        onMouseUp={handleSelection}
-        onTouchEnd={handleSelection} // For mobile devices
-      >
+      <div className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto" onMouseUp={handleMouseUp}>
         {text ? (
-          <div className="text-gray-300 whitespace-pre-wrap text-sm select-text" aria-live="polite">
-            {text}
-          </div>
+            <pre className="text-gray-300 whitespace-pre-wrap text-sm">{text}</pre>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            Text from your file will appear here.
-          </div>
+            <div className="flex items-center justify-center h-full text-gray-500">
+                Text from your file will appear here.
+            </div>
         )}
       </div>
-      <p className="text-xs text-gray-500 mt-2 text-center">Highlight a word or phrase above to add it to the selection panel.</p>
+       <p className="text-xs text-gray-500 mt-2 text-center">Highlight text above to add it to the selection panel.</p>
     </div>
   );
 };
@@ -113,10 +109,11 @@ interface ResultsPanelProps {
   onExport: () => void;
   isTranslating: boolean;
   results: TranslationResult[];
+  className?: string;
 }
 
-const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText, onTranslate, onExport, isTranslating, results }) => (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col">
+const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText, onTranslate, onExport, isTranslating, results, className }) => (
+    <div className={`bg-gray-800 p-6 rounded-lg shadow-lg h-full flex flex-col ${className || ''}`}>
         <h2 className="text-xl font-bold mb-4 text-sky-300">3. Select & Translate</h2>
         
         <div className="border border-gray-700 rounded-md p-3 mb-4 flex-shrink-0 h-40 overflow-y-auto">
@@ -133,7 +130,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                     ))}
                  </ul>
             ) : (
-                <div className="flex items-center justify-center h-full text-gray-500 text-sm">Text you select will be listed here.</div>
+                <div className="flex items-center justify-center h-full text-gray-500 text-sm">Text you highlight will be listed here.</div>
             )}
         </div>
 
@@ -148,7 +145,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
         <button
             onClick={onExport}
             disabled={results.length === 0}
-            className="mb-4 w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
+            className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors mb-4"
         >
             <DownloadIcon /> Export to Excel
         </button>
@@ -158,24 +155,20 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                 <thead className="text-xs text-sky-300 uppercase bg-gray-700 sticky top-0">
                     <tr>
                         <th scope="col" className="px-4 py-3">English</th>
-                        <th scope="col" className="px-4 py-3">Word Type</th>
                         <th scope="col" className="px-4 py-3">Phonetic</th>
                         <th scope="col" className="px-4 py-3">Vietnamese</th>
-                        <th scope="col" className="px-4 py-3">Example</th>
                     </tr>
                 </thead>
                 <tbody>
                     {results.length > 0 ? results.map((res, index) => (
                          <tr key={index} className="bg-gray-800 border-b border-gray-700 hover:bg-gray-600">
                             <td className="px-4 py-3 font-medium text-white">{res.english}</td>
-                            <td className="px-4 py-3">{res.wordType}</td>
                             <td className="px-4 py-3">{res.phonetic}</td>
                             <td className="px-4 py-3">{res.vietnamese}</td>
-                            <td className="px-4 py-3">{res.example}</td>
                         </tr>
                     )) : (
                         <tr>
-                            <td colSpan={5} className="text-center py-8 text-gray-500">Translation results will show here.</td>
+                            <td colSpan={3} className="text-center py-8 text-gray-500">Translation results will show here.</td>
                         </tr>
                     )}
                 </tbody>
@@ -275,7 +268,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 lg:p-8 flex flex-col">
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 lg:p-8">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
           AI Text Extractor & Translator
@@ -293,14 +286,14 @@ function App() {
         </div>
       )}
       
-      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
-        <FileUpload onFileChange={handleFileChange} onReset={handleReset} file={file} isLoading={isLoading} />
+      <main className="grid grid-cols-1 lg:grid-cols-6 gap-6 lg:h-[calc(100vh-12rem)]">
+        <FileUpload onFileChange={handleFileChange} onReset={handleReset} file={file} isLoading={isLoading} className="lg:col-span-1" />
         {isLoading ? (
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center">
+            <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center h-full lg:col-span-3">
                  <Spinner text="Extracting text..." />
             </div>
         ) : (
-            <TextViewer text={extractedText} onTextSelect={handleTextSelection} />
+            <TextViewer text={extractedText} onTextSelect={handleTextSelection} className="lg:col-span-3" />
         )}
         <ResultsPanel 
             selectedTexts={selectedTexts} 
@@ -309,13 +302,9 @@ function App() {
             onExport={handleExport}
             isTranslating={isTranslating}
             results={translationResults}
+            className="lg:col-span-2"
         />
       </main>
-      
-      <footer className="text-center pt-8 flex-shrink-0 text-gray-500 text-sm">
-        <p>&copy; 2025 AI Text Extractor & Translator. All Rights Reserved.</p>
-        <p className="mt-1">Một dự án cá nhân của Nam Vũ</p>
-      </footer>
     </div>
   );
 }
