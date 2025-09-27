@@ -12,13 +12,18 @@ const TrashIcon: React.FC = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
 );
 const TranslateIcon: React.FC = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m4 13l4-4M19 17v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2m14-8a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V9a2 2 0 012-2h2z" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m4 13l4-4M19 17v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2m14-8a2 2 0 012 2v2a2 2 0 01-2-2h-2a2 2 0 01-2-2V9a2 2 0 012-2h2z" /></svg>
 );
 const DownloadIcon: React.FC = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
 );
 const XCircleIcon: React.FC = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+);
+const FeedbackIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
 );
 
 // --- Child Components (defined outside App to prevent re-creation on re-renders) ---
@@ -176,6 +181,56 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
   </div>
 );
 
+interface FeedbackModalProps {
+  onClose: () => void;
+}
+
+const FeedbackModal: React.FC<FeedbackModalProps> = ({ onClose }) => {
+  const [feedbackText, setFeedbackText] = useState('');
+
+  const handleSubmit = () => {
+    if (feedbackText.trim() === '') {
+      return; // Don't send empty feedback
+    }
+    const subject = encodeURIComponent("Feedback for AI Text Extractor & Translator");
+    const body = encodeURIComponent(feedbackText);
+    window.location.href = `mailto:borutosolo23@gmail.com?subject=${subject}&body=${body}`;
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" aria-modal="true" role="dialog">
+      <div className="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 border border-gray-700">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-sky-300">Góp Ý & Báo Lỗi</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+             <XCircleIcon />
+          </button>
+        </div>
+        <p className="text-gray-400 mb-4 text-sm">Cảm ơn bạn đã dành thời gian. Mọi góp ý sẽ giúp ứng dụng tốt hơn.</p>
+        <textarea
+          value={feedbackText}
+          onChange={(e) => setFeedbackText(e.target.value)}
+          placeholder="Nhập nội dung góp ý của bạn ở đây..."
+          className="w-full h-40 bg-gray-900 text-gray-300 border border-gray-600 rounded-md p-3 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+          aria-label="Feedback input"
+        />
+        <div className="flex justify-end mt-6 space-x-3">
+          <button onClick={onClose} className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-md hover:bg-gray-700 transition">
+            Hủy
+          </button>
+          <button 
+            onClick={handleSubmit} 
+            disabled={!feedbackText.trim()}
+            className="px-4 py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition"
+          >
+            Gửi
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // --- Main App Component ---
 
@@ -184,6 +239,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   
   const [extractedText, setExtractedText] = useState('');
   const [selectedTexts, setSelectedTexts] = useState<SelectedText[]>([]);
@@ -267,7 +323,17 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 lg:p-8">
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 lg:p-8 relative">
+       <button
+          onClick={() => setIsFeedbackModalOpen(true)}
+          className="fixed top-4 right-4 z-40 flex items-center px-3 py-2 bg-gray-700 text-white font-semibold rounded-md hover:bg-gray-600 transition-colors shadow-lg text-sm"
+          aria-label="Open feedback form"
+        >
+          <FeedbackIcon /> Góp Ý
+        </button>
+
+        {isFeedbackModalOpen && <FeedbackModal onClose={() => setIsFeedbackModalOpen(false)} />}
+
       <header className="text-center mb-8">
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
           AI Text Extractor & Translator
