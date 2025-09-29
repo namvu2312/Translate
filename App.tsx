@@ -82,7 +82,7 @@ interface TextViewerProps {
 }
 
 const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }) => {
-  const handleMouseUp = () => {
+  const handleSelection = () => {
     const selection = window.getSelection()?.toString().trim();
     if (selection) {
       onTextSelect(selection);
@@ -92,7 +92,11 @@ const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }
   return (
     <div className={`bg-gray-800 p-4 rounded-lg shadow-lg h-full flex flex-col border border-gray-700 ${className || ''}`}>
       <h2 className="text-xl font-bold mb-4 text-sky-300">2. Extracted Text</h2>
-      <div className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto" onMouseUp={handleMouseUp}>
+      <div 
+        className="flex-grow bg-gray-900 rounded-md p-4 overflow-auto" 
+        onMouseUp={handleSelection}
+        onTouchEnd={handleSelection}
+      >
         {text ? (
             <pre className="text-gray-300 whitespace-pre-wrap text-sm">{text}</pre>
         ) : (
