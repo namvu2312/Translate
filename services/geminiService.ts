@@ -79,6 +79,8 @@ export const translateAndPhoneticize = async (
       contents: prompt,
       config: {
         tools: [{googleSearch: {}}],
+        // This is the key change: Force the model to respond immediately for streaming.
+        thinkingConfig: { thinkingBudget: 0 },
       },
     });
 
