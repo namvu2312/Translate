@@ -176,7 +176,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                         </tr>
                     )) : (
                         <tr>
-                            <td colSpan={3} className="text-center py-8 text-gray-500">Translation results will show here.</td>
+                            <td colSpan={3} className="text-center py-8 text-gray-500">
+                                {isTranslating ? 'Receiving results...' : 'Translation results will show here.'}
+                            </td>
                         </tr>
                     )}
                 </tbody>
@@ -348,12 +350,13 @@ function App() {
     setTranslationResults([]);
     try {
       const texts = selectedTexts.map(st => st.text);
-      const results = await translateAndPhoneticize(texts);
-      // Sort results to match selection order, as API might not preserve it
-      const sortedResults = texts.map(originalText => 
-        results.find(res => res.english === originalText)
-      ).filter((item): item is TranslationResult => !!item);
-      setTranslationResults(sortedResults);
+      
+      const handleNewResult = (newResult: TranslationResult) => {
+        setTranslationResults(prevResults => [...prevResults, newResult]);
+      };
+      
+      await translateAndPhoneticize(texts, handleNewResult);
+
     } catch (err: any) {
       setError(err.message || 'An unknown error occurred during translation.');
     } finally {
@@ -362,7 +365,11 @@ function App() {
   };
   
   const handleExport = () => {
-    exportToExcel(translationResults, `translation_export_${new Date().toISOString().split('T')[0]}`);
+    const textsInOrder = selectedTexts.map(st => st.text);
+    const sortedResults = textsInOrder.map(originalText => 
+        translationResults.find(res => res.english === originalText)
+    ).filter((item): item is TranslationResult => !!item);
+    exportToExcel(sortedResults, `translation_export_${new Date().toISOString().split('T')[0]}`);
   };
 
   return (

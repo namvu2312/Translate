@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import type { TranslationResult } from '../types';
 
 const API_KEY = process.env.API_KEY;
@@ -48,9 +48,12 @@ export const extractTextFromFile = async (file: File): Promise<string> => {
   }
 };
 
-export const translateAndPhoneticize = async (texts: string[]): Promise<TranslationResult[]> => {
+export const translateAndPhoneticize = async (
+  texts: string[],
+  onResult: (result: TranslationResult) => void
+): Promise<void> => {
   if (!texts || texts.length === 0) {
-    return [];
+    return;
   }
 
   const prompt = `You are an expert linguist and translator. Your task is to provide Vietnamese translations and highly accurate IPA phonetic transcriptions for a list of English phrases.
@@ -65,10 +68,13 @@ export const translateAndPhoneticize = async (texts: string[]): Promise<Translat
   ${texts.map(text => `- "${text}"`).join('\n')}
   
   **Output Format:**
-  Return the result as a single, valid JSON array of objects. Each object must have three keys: 'english', 'phonetic', and 'vietnamese'. The 'english' key must exactly match the input phrase. Do not include any text or markdown formatting (like \`\`\`json) outside of the JSON array itself.`;
+  You will return a stream of individual JSON objects, **one per line**. Each object must have three keys: 'english', 'phonetic', and 'vietnamese'. The 'english' key must exactly match one of the input phrases.
+  **DO NOT** wrap the objects in a JSON array (like \`[\` or \`]\`).
+  **DO NOT** use markdown formatting (like \`\`\`json).
+  Each line of your output must be a single, complete, valid JSON object.`;
 
   try {
-    const response = await ai.models.generateContent({
+    const responseStream = await ai.models.generateContentStream({
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
@@ -76,19 +82,35 @@ export const translateAndPhoneticize = async (texts: string[]): Promise<Translat
       },
     });
 
-    const jsonStr = response.text.trim();
-    // More robust parsing to handle potential markdown fences if the model adds them
-    const startIndex = jsonStr.indexOf('[');
-    const endIndex = jsonStr.lastIndexOf(']');
-    if (startIndex === -1 || endIndex === -1) {
-        throw new Error("Invalid JSON array format received from the translation service.");
+    let buffer = '';
+    for await (const chunk of responseStream) {
+      buffer += chunk.text;
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || ''; // Keep the last, potentially incomplete line
+
+      for (const line of lines) {
+        if (line.trim()) {
+          try {
+            const result = JSON.parse(line);
+            onResult(result as TranslationResult);
+          } catch (e) {
+            console.warn("Skipping invalid JSON line from stream:", line, e);
+          }
+        }
+      }
     }
-    const jsonArrayStr = jsonStr.substring(startIndex, endIndex + 1);
-    
-    const result = JSON.parse(jsonArrayStr);
-    return result as TranslationResult[];
+    // Process any remaining text in the buffer
+    if (buffer.trim()) {
+        try {
+            const result = JSON.parse(buffer);
+            onResult(result as TranslationResult);
+        } catch (e) {
+             console.warn("Skipping invalid JSON from final buffer:", buffer, e);
+        }
+    }
+
   } catch (e) {
-    console.error("Failed to parse Gemini JSON response:", e);
-    throw new Error("The translation service returned an invalid format. Please try again.");
+    console.error("Failed during streaming or parsing Gemini response:", e);
+    throw new Error("The translation service failed during streaming. Please try again.");
   }
 };
