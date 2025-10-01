@@ -381,36 +381,40 @@ function App() {
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">
           AI Text Extractor & Translator
         </h1>
-        <p className="text-gray-400 mt-2">Powered by Google Gemini</p>
       </header>
       
       {error && (
-        <div className="bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded-lg relative mb-6" role="alert">
-            <strong className="font-bold">Error: </strong>
-            <span className="block sm:inline">{error}</span>
-            <button onClick={() => setError(null)} className="absolute top-0 bottom-0 right-0 px-4 py-3">
-                <svg className="fill-current h-6 w-6 text-red-300" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
-            </button>
+        <div className="bg-red-900 border border-red-500 text-red-200 px-4 py-3 rounded-lg relative mb-6">
+          <strong className="font-bold">Error: </strong>
+          <span className="block sm:inline">{error}</span>
+          <button onClick={() => setError(null)} className="absolute top-0 bottom-0 right-0 px-4 py-3">
+            <XCircleIcon />
+          </button>
         </div>
       )}
+
+      {isLoading && (
+          <div className="flex flex-col items-center justify-center my-8">
+              <Spinner text="Extracting text from your file..." />
+              <p className="text-gray-400 mt-2 text-sm">This may take a moment for large files.</p>
+          </div>
+      )}
       
-      <main className="grid grid-cols-1 lg:grid-cols-6 gap-6 lg:h-[calc(100vh-12rem)]">
-        <FileUpload onFileChange={handleFileChange} onReset={handleReset} file={file} isLoading={isLoading} className="lg:col-span-1" />
-        {isLoading ? (
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center h-full lg:col-span-3 border border-gray-700">
-                 <Spinner text="Extracting text..." />
-            </div>
-        ) : (
-            <TextViewer text={extractedText} onTextSelect={handleTextSelection} className="lg:col-span-3" />
-        )}
+      <main className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto h-[calc(100vh-12rem)]">
+        <FileUpload 
+            onFileChange={handleFileChange}
+            onReset={handleReset}
+            file={file}
+            isLoading={isLoading}
+        />
+        <TextViewer text={extractedText} onTextSelect={handleTextSelection} />
         <ResultsPanel 
-            selectedTexts={selectedTexts} 
+            selectedTexts={selectedTexts}
             onRemoveText={handleRemoveSelectedText}
             onTranslate={handleTranslate}
             onExport={handleExport}
             isTranslating={isTranslating}
             results={translationResults}
-            className="lg:col-span-2"
         />
       </main>
     </div>
