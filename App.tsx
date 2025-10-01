@@ -83,10 +83,14 @@ interface TextViewerProps {
 
 const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }) => {
   const handleSelection = () => {
-    const selection = window.getSelection()?.toString().trim();
-    if (selection) {
-      onTextSelect(selection);
-    }
+    // Add a small delay to allow mobile browsers to finalize the text selection
+    // before we try to read it. This is a common pattern for touch devices.
+    setTimeout(() => {
+        const selection = window.getSelection()?.toString().trim();
+        if (selection) {
+          onTextSelect(selection);
+        }
+    }, 100);
   };
 
   return (
