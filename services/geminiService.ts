@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { TranslationResult } from '../types';
 
@@ -54,45 +53,39 @@ export const translateAndPhoneticize = async (texts: string[]): Promise<Translat
     return [];
   }
 
-  const prompt = `For the following list of English phrases, provide the Vietnamese translation and the IPA phonetic transcription for each phrase.
-  
-  Phrases:
+  const prompt = `You are an expert linguist and translator. Your task is to provide Vietnamese translations and highly accurate IPA phonetic transcriptions for a list of English phrases.
+
+  **CRITICAL INSTRUCTIONS FOR PHONETICS:**
+  1. For the IPA phonetic transcription of each phrase, you **MUST** use the British English pronunciation from the Oxford Learner's Dictionaries (oxfordlearnersdictionaries.com) as your sole and authoritative source.
+  2. Use your web search capability to look up each word or the full phrase on that specific website.
+  3. If you find an entry, use its IPA transcription exactly as provided. For multi-word phrases, combine the IPA of individual words.
+  4. If a word cannot be found in the Oxford Learner's Dictionaries after searching, use "N/A" for its phonetic part. Do not guess or use other sources.
+
+  **Input Phrases:**
   ${texts.map(text => `- "${text}"`).join('\n')}
   
-  Return the result as a valid JSON array of objects. Each object must have three keys: 'english', 'phonetic', and 'vietnamese'. The 'english' key must exactly match the input phrase.`;
+  **Output Format:**
+  Return the result as a single, valid JSON array of objects. Each object must have three keys: 'english', 'phonetic', and 'vietnamese'. The 'english' key must exactly match the input phrase. Do not include any text or markdown formatting (like \`\`\`json) outside of the JSON array itself.`;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              english: {
-                type: Type.STRING,
-                description: 'The original English phrase.',
-              },
-              phonetic: {
-                type: Type.STRING,
-                description: 'The IPA phonetic transcription of the English phrase.',
-              },
-              vietnamese: {
-                type: Type.STRING,
-                description: 'The Vietnamese translation of the phrase.',
-              },
-            },
-            required: ["english", "phonetic", "vietnamese"],
-          },
-        },
+        tools: [{googleSearch: {}}],
       },
     });
 
     const jsonStr = response.text.trim();
-    const result = JSON.parse(jsonStr);
+    // More robust parsing to handle potential markdown fences if the model adds them
+    const startIndex = jsonStr.indexOf('[');
+    const endIndex = jsonStr.lastIndexOf(']');
+    if (startIndex === -1 || endIndex === -1) {
+        throw new Error("Invalid JSON array format received from the translation service.");
+    }
+    const jsonArrayStr = jsonStr.substring(startIndex, endIndex + 1);
+    
+    const result = JSON.parse(jsonArrayStr);
     return result as TranslationResult[];
   } catch (e) {
     console.error("Failed to parse Gemini JSON response:", e);
