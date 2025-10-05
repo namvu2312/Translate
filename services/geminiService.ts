@@ -56,7 +56,7 @@ export const translateAndPhoneticize = async (
     return;
   }
 
-  const prompt = `You are an expert linguist and translator. Your task is to provide Vietnamese translations and highly accurate IPA phonetic transcriptions for a list of English phrases.
+  const prompt = `You are an expert linguist and translator. Your task is to provide Vietnamese translations, highly accurate IPA phonetic transcriptions, and a simple English example sentence for a list of English phrases.
 
   **CRITICAL INSTRUCTIONS FOR PHONETICS:**
   1. For the IPA phonetic transcription of each phrase, you **MUST** use the British English pronunciation from the Oxford Learner's Dictionaries (oxfordlearnersdictionaries.com) as your sole and authoritative source.
@@ -64,11 +64,15 @@ export const translateAndPhoneticize = async (
   3. If you find an entry, use its IPA transcription exactly as provided. For multi-word phrases, combine the IPA of individual words.
   4. If a word cannot be found in the Oxford Learner's Dictionaries after searching, use "N/A" for its phonetic part. Do not guess or use other sources.
 
+  **INSTRUCTIONS FOR EXAMPLE SENTENCE:**
+  - Create a clear, simple, and natural-sounding English sentence that correctly uses the input phrase.
+  - The example should be easy to understand.
+
   **Input Phrases:**
   ${texts.map(text => `- "${text}"`).join('\n')}
   
   **Output Format:**
-  You will return a stream of individual JSON objects, **one per line**. Each object must have three keys: 'english', 'phonetic', and 'vietnamese'. The 'english' key must exactly match one of the input phrases.
+  You will return a stream of individual JSON objects, **one per line**. Each object must have four keys: 'english', 'phonetic', 'vietnamese', and 'example'. The 'english' key must exactly match one of the input phrases.
   **DO NOT** wrap the objects in a JSON array (like \`[\` or \`]\`).
   **DO NOT** use markdown formatting (like \`\`\`json).
   Each line of your output must be a single, complete, valid JSON object.`;

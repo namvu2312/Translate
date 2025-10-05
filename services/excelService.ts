@@ -16,7 +16,8 @@ export const exportToExcel = (data: TranslationResult[], fileName: string): void
   const dataToExport = data.map(item => ({
     "Tiếng Anh": item.english,
     "Phiên âm": item.phonetic,
-    "Tiếng Việt": item.vietnamese
+    "Tiếng Việt": item.vietnamese,
+    "Ví dụ": item.example
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -26,6 +27,7 @@ export const exportToExcel = (data: TranslationResult[], fileName: string): void
     { wch: 40 }, // English
     { wch: 40 }, // Phonetic
     { wch: 40 }, // Vietnamese
+    { wch: 60 }, // Example
   ];
 
   const workbook = XLSX.utils.book_new();
