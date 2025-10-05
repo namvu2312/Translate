@@ -3,6 +3,7 @@ import type { TranslationResult, SelectedText } from './types';
 import { extractTextFromFile, translateAndPhoneticize } from './services/geminiService';
 import { exportToExcel } from './services/excelService';
 import Spinner from './components/Spinner';
+import { Analytics } from '@vercel/analytics/react';
 
 // --- Icon Components ---
 const UploadIcon: React.FC = () => (
@@ -430,6 +431,7 @@ function App() {
             isTranslating={isTranslating}
             results={translationResults}
         />
+         <Analytics />
       </main>
     </div>
   );
