@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +20,59 @@
   }
 }
 </script>
+<style>
+  /* --- Custom Animations & Effects --- */
+
+  /* 1. Button Hover Effect */
+  .btn-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  .btn-lift:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  /* Specifically target the main blue button for a matching shadow */
+  .btn-lift-blue:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  /* 2. Empty State Icon Hover Effect */
+  .empty-state-icon {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+  .empty-state-container:hover .empty-state-icon {
+    transform: scale(1.05);
+    opacity: 0.5 !important; /* Override Tailwind's utility class */
+  }
+
+  /* 3. "Add to list" Animation */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fadeInDown {
+    animation: fadeInDown 0.4s ease-out forwards;
+  }
+
+  /* 4. "Show results" Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+</style>
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans antialiased">
   <div id="root"></div>

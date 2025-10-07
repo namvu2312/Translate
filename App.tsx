@@ -6,7 +6,6 @@ import Spinner from './components/Spinner';
 import { FiFileText } from 'react-icons/fi';
 import { BsCardList } from 'react-icons/bs';
 import { MdGTranslate } from 'react-icons/md';
-import { Analytics } from '@vercel/analytics/react';
 
 // --- Icon Components ---
 const UploadIcon: React.FC = () => (
@@ -72,7 +71,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileChange, onReset, file, is
     <button
         onClick={onReset}
         disabled={!file && !isLoading}
-        className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-slate-600 text-slate-300 font-bold rounded-md hover:bg-slate-700 hover:text-white disabled:border-slate-700 disabled:text-slate-500 disabled:bg-transparent disabled:cursor-not-allowed transition-colors"
+        className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-slate-600 text-slate-300 font-bold rounded-md hover:bg-slate-700 hover:text-white disabled:border-slate-700 disabled:text-slate-500 disabled:bg-transparent disabled:cursor-not-allowed transition-colors btn-lift"
     >
         <TrashIcon /> <span className="ml-2">Reset</span>
     </button>
@@ -108,8 +107,8 @@ const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }
         {text ? (
             <pre className="text-slate-300 whitespace-pre-wrap text-sm">{text}</pre>
         ) : (
-            <div className="flex flex-col items-center justify-center h-full text-slate-500 text-center">
-                <FiFileText className="text-5xl opacity-30 mb-4" />
+            <div className="flex flex-col items-center justify-center h-full text-slate-500 text-center empty-state-container">
+                <FiFileText className="text-5xl opacity-30 mb-4 empty-state-icon" />
                 <p className="text-sm">Nội dung văn bản sẽ hiện ra ở đây.</p>
                 <p className="text-sm">Hãy thử tải lên một file để xem điều kỳ diệu!</p>
             </div>
@@ -139,7 +138,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
             {selectedTexts.length > 0 ? (
                  <ul className="space-y-2">
                     {selectedTexts.map(({id, text}) => (
-                        <li key={id} className="bg-slate-700/50 p-2 rounded-md text-sm flex justify-between items-center group">
+                        <li key={id} className="bg-slate-700/50 p-2 rounded-md text-sm flex justify-between items-center group animate-fadeInDown">
                             <span className="truncate pr-2 text-slate-300">{text}</span>
                             <button onClick={() => onRemoveText(id)} className="text-slate-500 hover:text-red-400 opacity-50 group-hover:opacity-100 transition-opacity">
                                 <XCircleIcon />
@@ -148,8 +147,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                     ))}
                  </ul>
             ) : (
-                <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm text-center px-4">
-                    <BsCardList className="text-5xl opacity-30 mb-4" />
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm text-center px-4 empty-state-container">
+                    <BsCardList className="text-5xl opacity-30 mb-4 empty-state-icon" />
                     <p>Các từ bạn bôi đen sẽ được thu thập tại đây.</p>
                 </div>
             )}
@@ -158,7 +157,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
         <button 
             onClick={onTranslate} 
             disabled={selectedTexts.length === 0 || isTranslating}
-            className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-500 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20 mb-2"
+            className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-500 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed transition-colors shadow-lg shadow-blue-600/20 mb-2 btn-lift btn-lift-blue"
         >
             {isTranslating ? <Spinner text="Translating..." /> : <><TranslateIcon /> Translate Selection</>}
         </button>
@@ -166,7 +165,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
         <button
             onClick={onExport}
             disabled={results.length === 0}
-            className="w-full flex items-center justify-center px-4 py-2 border border-slate-600 text-slate-300 font-bold rounded-md hover:bg-slate-700 hover:text-white disabled:border-slate-700 disabled:text-slate-500 disabled:bg-transparent disabled:cursor-not-allowed transition-colors mb-4"
+            className="w-full flex items-center justify-center px-4 py-2 border border-slate-600 text-slate-300 font-bold rounded-md hover:bg-slate-700 hover:text-white disabled:border-slate-700 disabled:text-slate-500 disabled:bg-transparent disabled:cursor-not-allowed transition-colors mb-4 btn-lift"
         >
             <DownloadIcon /> Export to Excel
         </button>
@@ -183,7 +182,11 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                 </thead>
                 <tbody>
                     {results.length > 0 ? results.map((res, index) => (
-                         <tr key={index} className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors">
+                         <tr 
+                            key={index} 
+                            className="border-b border-slate-700 hover:bg-slate-700/50 transition-colors animate-fadeIn"
+                            style={{ animationDelay: `${index * 50}ms`, opacity: 0 }}
+                         >
                             <td className="px-4 py-3 font-medium text-slate-100">{res.english}</td>
                             <td className="px-4 py-3">{res.phonetic}</td>
                             <td className="px-4 py-3">{res.vietnamese}</td>
@@ -193,8 +196,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                         <tr>
                             <td colSpan={4} className="text-center py-8 text-slate-500">
                                 {isTranslating ? 'Receiving results...' : (
-                                    <div className="flex flex-col items-center justify-center">
-                                        <MdGTranslate className="text-5xl opacity-30 mb-4" />
+                                    <div className="flex flex-col items-center justify-center empty-state-container">
+                                        <MdGTranslate className="text-5xl opacity-30 mb-4 empty-state-icon" />
                                         <p>Kết quả dịch, phiên âm và ví dụ đang chờ bạn.</p>
                                     </div>
                                 )}
@@ -448,7 +451,6 @@ function App() {
             isTranslating={isTranslating}
             results={translationResults}
         />
-        <Analytics />
       </main>
     </div>
   );
