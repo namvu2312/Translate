@@ -86,7 +86,7 @@ interface TextViewerProps {
 }
 
 const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }) => {
-  const handleSelection = () => {
+  const handleSelection = useCallback(() => {
     // Add a small delay to allow mobile browsers to finalize the text selection
     // before we try to read it. This is a common pattern for touch devices.
     setTimeout(() => {
@@ -95,7 +95,7 @@ const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }
           onTextSelect(selection);
         }
     }, 100);
-  };
+  }, [onTextSelect]);
 
   return (
     <div className={`bg-slate-800/50 p-6 rounded-xl shadow-lg h-full flex flex-col border border-slate-700/50 ${className || ''}`}>
@@ -350,12 +350,16 @@ function App() {
     setFile(selectedFile);
   };
   
-  const handleTextSelection = (text: string) => {
-    if(!selectedTexts.some(st => st.text === text)) {
-      const newSelection = { id: `${Date.now()}-${text.slice(0, 10)}`, text };
-      setSelectedTexts(prev => [...prev, newSelection]);
-    }
-  };
+  const handleTextSelection = useCallback((text: string) => {
+    const newSelection = { id: `${Date.now()}-${text.slice(0, 10)}`, text };
+    setSelectedTexts(prev => {
+        // Check for duplicates inside the updater to prevent stale closures and ensure stability
+        if (prev.some(st => st.text === text)) {
+            return prev;
+        }
+        return [...prev, newSelection];
+    });
+  }, []);
 
   const handleRemoveSelectedText = (id: string) => {
     setSelectedTexts(prev => prev.filter(st => st.id !== id));
