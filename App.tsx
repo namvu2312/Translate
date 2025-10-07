@@ -6,6 +6,7 @@ import Spinner from './components/Spinner';
 import { FiFileText } from 'react-icons/fi';
 import { BsCardList } from 'react-icons/bs';
 import { MdGTranslate } from 'react-icons/md';
+import { Analytics } from '@vercel/analytics/react';
 
 // --- Icon Components ---
 const UploadIcon: React.FC = () => (
@@ -451,6 +452,7 @@ function App() {
             isTranslating={isTranslating}
             results={translationResults}
         />
+        <Analytics />
       </main>
     </div>
   );
