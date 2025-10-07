@@ -3,7 +3,9 @@ import type { TranslationResult, SelectedText } from './types';
 import { extractTextFromFile, translateAndPhoneticize } from './services/geminiService';
 import { exportToExcel } from './services/excelService';
 import Spinner from './components/Spinner';
-import { Analytics } from '@vercel/analytics/react';
+import { FiFileText } from 'react-icons/fi';
+import { BsCardList } from 'react-icons/bs';
+import { MdGTranslate } from 'react-icons/md';
 
 // --- Icon Components ---
 const UploadIcon: React.FC = () => (
@@ -105,8 +107,10 @@ const TextViewer: React.FC<TextViewerProps> = ({ text, onTextSelect, className }
         {text ? (
             <pre className="text-slate-300 whitespace-pre-wrap text-sm">{text}</pre>
         ) : (
-            <div className="flex items-center justify-center h-full text-slate-500">
-                Text from your file will appear here.
+            <div className="flex flex-col items-center justify-center h-full text-slate-500 text-center">
+                <FiFileText className="text-5xl opacity-30 mb-4" />
+                <p className="text-sm">Nội dung văn bản sẽ hiện ra ở đây.</p>
+                <p className="text-sm">Hãy thử tải lên một file để xem điều kỳ diệu!</p>
             </div>
         )}
       </div>
@@ -143,7 +147,10 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                     ))}
                  </ul>
             ) : (
-                <div className="flex items-center justify-center h-full text-slate-500 text-sm">Text you highlight will be listed here.</div>
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm text-center px-4">
+                    <BsCardList className="text-5xl opacity-30 mb-4" />
+                    <p>Các từ bạn bôi đen sẽ được thu thập tại đây.</p>
+                </div>
             )}
         </div>
 
@@ -184,7 +191,12 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ selectedTexts, onRemoveText
                     )) : (
                         <tr>
                             <td colSpan={4} className="text-center py-8 text-slate-500">
-                                {isTranslating ? 'Receiving results...' : 'Translation results will show here.'}
+                                {isTranslating ? 'Receiving results...' : (
+                                    <div className="flex flex-col items-center justify-center">
+                                        <MdGTranslate className="text-5xl opacity-30 mb-4" />
+                                        <p>Kết quả dịch, phiên âm và ví dụ đang chờ bạn.</p>
+                                    </div>
+                                )}
                             </td>
                         </tr>
                     )}
@@ -431,7 +443,6 @@ function App() {
             isTranslating={isTranslating}
             results={translationResults}
         />
-         <Analytics />
       </main>
     </div>
   );
